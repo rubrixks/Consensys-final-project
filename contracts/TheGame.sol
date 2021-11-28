@@ -7,11 +7,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract TheGame is ERC1155, Ownable {
   uint256[] public totalSupply =[1000000000,1000000000];
   uint256[] public Loses = [0,0];
-  uint8 public cost = .0001 ether;
+  uint public cost = .0001 ether;
   uint256 public totalLoses = 0;
 
 function mint(uint256 id, uint256 amount) public payable {
-        require(id <= LostOnes.length, "Try again friend. Either you lost the Game, or someone else set you up.");
+        require(id <= totalSupply.length, "Try again friend. Either you lost the Game, or someone else set you up.");
         require(id >0, "What are you doing?");
         require(amount ==1, "Why do you want more than one L on your record? Take one only.");
         uint index = id-1;
@@ -21,8 +21,12 @@ function mint(uint256 id, uint256 amount) public payable {
         Loses[index] += amount;
         totalLoses= totalLoses +amount;
     }
-  constructor() public {
+  constructor() public ERC1155("https://bafybeigveibvckajbywdovpwqo2szrsifaso7gbnd36sdmlaxbqcthduo4.ipfs.dweb.link/{id}.json"){
   
+  }
+
+  function getBalance() public view returns (uint){
+    return address(this).balance;
   }
 
 
