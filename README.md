@@ -16,8 +16,11 @@ By having a decentralized immutable ledger, anyone in the world can see and coun
 Work Flow:
 
 1.Users will visit the website and be offered two options to mint an NFT.
+
     A.Solo Lost Game
+
     B.Lost Game by Friend/Used to make a friend/stranger lose the game
+    
 2.Both option A. & option B. will show a metamask extension when a user clicks the mint button. the metamask extension will pop up 
 and ask for .0001 Ether to mint the NFT.
 

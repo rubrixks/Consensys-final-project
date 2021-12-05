@@ -9,23 +9,24 @@ contract TheGame is ERC1155, Ownable {
   uint256[] public Loses = [0,0];
   uint public cost = .0001 ether;
   uint256 public totalLoses = 0;
+  mapping (address => uint) public LossDirectory;
 
 function mint(uint256 id, uint256 amount) public payable {
         require(id <= totalSupply.length, "Try again friend. Either you lost the Game, or someone else set you up.");
         require(id >0, "What are you doing?");
-        require(amount ==1, "Why do you want more than one L on your record? Take one only.");
+        require(amount ==1, "Why do you want more than one L on your record? One NFT at a time.");
         uint index = id-1;
         require(Loses[index] <= totalSupply[index], "Surprisingly, we ran out. There are more Ls out there in the world, just ask someone to send you one. ");
-        require(msg.value == cost, "Sorry Friend. minting this NFT costs .0001 ether");
+        //require(msg.value == cost, "Sorry Friend. minting this NFT costs .0001 ether");
         _mint(msg.sender, id, amount, "0x00");
         Loses[index] += amount;
         totalLoses= totalLoses +amount;
+        LossDirectory[msg.sender] = amount;
     }
-  constructor() public ERC1155("https://bafybeigveibvckajbywdovpwqo2szrsifaso7gbnd36sdmlaxbqcthduo4.ipfs.dweb.link/{id}.json"){
+  constructor() public ERC1155("https://bafybeihaf2meo5vw7hlrktinfd3rvejc5v4pu2ezexzecayc3szyb4mfxu.ipfs.dweb.link/{id}.json"){
   
   }
-
-  function getBalance() public view returns (uint){
+    function getBalance() public view returns (uint){
     return address(this).balance;
   }
 
