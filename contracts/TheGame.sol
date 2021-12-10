@@ -1,34 +1,46 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-contract TheGame is ERC1155, Ownable {
-  uint256[] public totalSupply =[1000000000,1000000000];
-  uint256[] public Loses = [0,0];
-  uint public cost = .0001 ether;
-  uint256 public totalLoses = 0;
-  mapping (address => uint) public LossDirectory;
-
-function mint(uint256 id, uint256 amount) public payable {
-        require(id <= totalSupply.length, "Try again friend. Either you lost the Game, or someone else set you up.");
-        require(id >0, "What are you doing?");
-        require(amount ==1, "Why do you want more than one L on your record? One NFT at a time.");
-        uint index = id-1;
-        require(Loses[index] <= totalSupply[index], "Surprisingly, we ran out. There are more Ls out there in the world, just ask someone to send you one. ");
-        //require(msg.value == cost, "Sorry Friend. minting this NFT costs .0001 ether");
-        _mint(msg.sender, id, amount, "0x00");
-        Loses[index] += amount;
-        totalLoses= totalLoses +amount;
-        LossDirectory[msg.sender] = amount;
-    }
-  constructor() public ERC1155("https://bafybeihaf2meo5vw7hlrktinfd3rvejc5v4pu2ezexzecayc3szyb4mfxu.ipfs.dweb.link/{id}.json"){
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+contract TheGame is ERC721,ERC721URIStorage, Ownable {
+  uint public totalSupply = 2^256;
+  uint public totalLosses =0;
+  string public baseURI = "https://bafkreigm33tvwbd3t6led7tltb5ff67zvbhofihj7axifto5f7ffnsmghm.ipfs.dweb.link/";
+  mapping (address=>uint) LossTracker;
   
-  }
-    function getBalance() public view returns (uint){
-    return address(this).balance;
-  }
 
+  using Counters for Counters.Counter;
+    Counters.Counter private _tokenIdCounter;
+
+    constructor() ERC721("TheGame", "LOST") {
+    }
+
+    function safeMint(address to,uint amountOfLosses) public {
+        uint256 tokenId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
+        _safeMint(to, tokenId);
+        _setTokenURI(tokenId, baseURI);
+        LossTracker[msg.sender] = LossTracker[msg.sender] + amountOfLosses;
+
+    }
+
+    // The following functions are overrides required by Solidity.
+
+    function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
+        super._burn(tokenId);
+    }
+
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override(ERC721, ERC721URIStorage)
+        returns (string memory)
+    {
+        return super.tokenURI(tokenId);
+    }
 
 }
