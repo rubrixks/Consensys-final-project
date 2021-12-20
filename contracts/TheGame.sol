@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0;
+pragma solidity 0.8.11;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -16,7 +15,8 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 contract TheGame is ERC721,ERC721URIStorage, Ownable {
 
   bool public GameStarts = false;
-  uint public totalSupply = 2**256-1;
+  uint public MaxSupply = 2**256-1;
+  uint public mintedLosses = 0;
   uint public totalLosses =0;
   string public baseURI = "https://bafkreigm33tvwbd3t6led7tltb5ff67zvbhofihj7axifto5f7ffnsmghm.ipfs.dweb.link/";
   uint public LossBasePrice = .00025 ether;
@@ -33,13 +33,12 @@ contract TheGame is ERC721,ERC721URIStorage, Ownable {
     /// @dev Only the owner can call this function
     function FirstLoser() payable public onlyOwner  {
       beginTheGame();
-      require(msg.sender == owner(), "Only the owner can call this function.");
-      require(msg.value == LossBasePrice * 10,"Not enough Ether was sent");
-        for (uint i = 0; i < 10; i++) {
+      require(msg.value == LossBasePrice * 100,"Not enough Ether was sent");
+        for (uint i = 0; i < 100; i++) {
           safeMint(msg.sender);
         }
-        totalLosses = totalLosses + 10;
-        LossTracker[msg.sender] = LossTracker[msg.sender] + 10;
+        totalLosses = totalLosses + 100;
+        LossTracker[msg.sender] = LossTracker[msg.sender] + 100;
     } 
     ///Needs to HandOutLs after owner is given first 100 Ls;
     /// notice Anyone who has thought about the game can mint as many Losses as they have thought of 
@@ -47,11 +46,12 @@ contract TheGame is ERC721,ERC721URIStorage, Ownable {
     /// param address wanting to mint and amount of losses wanted on the address
     function HandOutLs(address to, uint amountOfLosses) payable public {
       require(GameStarts == true,"The Game has not begun");
-      require(amountOfLosses <= 100000,"Stop thinking about The Game.");
-      require(msg.value == LossBasePrice * amountOfLosses,"Sorry friend,  send the exact amount of Ether required");
+      require(mintedLosses +amountOfLosses<= MaxSupply,"We reached our technological limit. Mint less losses, or ask another Loser to send you one.");
+      require(msg.value == LossBasePrice * amountOfLosses,"Sorry friend, send the exact amount of Ether required");
         for (uint i = 0; i < amountOfLosses; i++) {
           safeMint(to);
         }
+        mintedLosses = mintedLosses + amountOfLosses;
         totalLosses = totalLosses + amountOfLosses;
         LossTracker[msg.sender] = LossTracker[msg.sender] + amountOfLosses;
         }
@@ -64,12 +64,6 @@ contract TheGame is ERC721,ERC721URIStorage, Ownable {
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, baseURI);
     }
-
-    // The following functions are overrides required by Solidity.
-    ///NEEDS TO BE FIXED
-    /// notice burns the Loss NFT from the address requesting to burn
-    /// dev Only the owner can burn their Loss
-    /// param tokenID so the address can identify which loss to get rid of the NFT
     function _burn(uint256 tokenId) internal override(ERC721, ERC721URIStorage) {
         super._burn(tokenId);
     }
@@ -88,9 +82,10 @@ contract TheGame is ERC721,ERC721URIStorage, Ownable {
       return LossTracker[ad];
     }
     function withdraw() payable public onlyOwner {
-        uint balance = address(this).balance;
-        payable(msg.sender).transfer(balance);
+        uint amount = address(this).balance;
+        payable(msg.sender).transfer(amount);
     }
+
     function beginTheGame() public onlyOwner {
         GameStarts = !GameStarts;
     }

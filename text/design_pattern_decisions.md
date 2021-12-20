@@ -1,0 +1,5 @@
+The two design patterns used in this project were inheriting the Open Zeppelin implementation of the ERC721 standard, and the Open Zepplelin implementation of Ownable.
+
+Inheriting 721 was necessary to make these tokens non-fungible. My initial design was to use ERC1155 so I could seperate use cases of people minting the Lost NFT when they lost the game or minting a different NFT to make their friends lose. However, users may not interact with the contract by those rules, so to make it simpler, I decided to switch over to the 721 standard.
+
+Ownable was neccessary in this project, so I could be the first one to mint the NFTs because I must have thought about the game 100 times by now. Also, the nonfungibility comes from the TokenID since all URI's point to the same JSON file. However, the minter and the previous losers attached to the specifc NFT are what could make the token valuable. This another reason why the first 100 NFTs can only be minted by owner. 
