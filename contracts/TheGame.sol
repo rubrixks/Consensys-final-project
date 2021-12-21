@@ -31,14 +31,15 @@ contract TheGame is ERC721,ERC721URIStorage, Ownable {
 
     /// @notice Allows creator to mint the first 100 losses
     /// @dev Only the owner can call this function
-    function FirstLoser() payable public onlyOwner  {
+    function firstLoser() payable public onlyOwner  {
       beginTheGame();
-      require(msg.value == LossBasePrice * 100,"Not enough Ether was sent");
-        for (uint i = 0; i < 100; i++) {
+      require(msg.value == LossBasePrice * 10,"Not enough Ether was sent");
+        for (uint i = 0; i < 10; i++) {
           safeMint(msg.sender);
         }
-        totalLosses = totalLosses + 100;
-        LossTracker[msg.sender] = LossTracker[msg.sender] + 100;
+        totalLosses = totalLosses + 10;
+        LossTracker[msg.sender] = LossTracker[msg.sender] + 10;
+        
     } 
     ///Needs to HandOutLs after owner is given first 100 Ls;
     /// notice Anyone who has thought about the game can mint as many Losses as they have thought of 
@@ -89,4 +90,5 @@ contract TheGame is ERC721,ERC721URIStorage, Ownable {
     function beginTheGame() public onlyOwner {
         GameStarts = !GameStarts;
     }
+    
 }
